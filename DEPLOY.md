@@ -88,3 +88,22 @@ An "AccessDenied" error means the IAM policy above is missing or wrong.
 ## Updating
 
 Replace `server.js` on the NAS, then stop and run the Task Scheduler task again.
+
+## 6. Blog newsletter → Brevo sync (`brevo-sync.js`)
+
+Keeps the Brevo lists **Blog-nl** (everyone), **Blog-nl EN** and **Blog-nl DE** in step with `blog-emails.json`
+(new subscribers added, language changes moved, people removed from the JSON taken off the lists). The EN/DE lists are
+created on the first run. The blog build (`blog-engine/brevo-campaigns.cjs`) schedules each post's EN campaign to
+Blog-nl EN and DE campaign to Blog-nl DE, so the sync must run shortly before every send.
+
+1. Copy `brevo-sync.js` (and the updated `package.json`) next to `server.js` on the NAS.
+2. Add `BREVO_API_KEY=...` to the NAS `.env` (Brevo → SMTP & API → API keys). The existing read-only S3 user is enough.
+3. Test: `node brevo-sync.js --dry-run`, then `node brevo-sync.js`.
+4. DSM → Task Scheduler → Create → Scheduled Task → User-defined script. Schedule: daily, every 1 hour,
+   first run 00:45, last run 23:45 (all sends are on the hour). Script:
+
+```bash
+cd /volume1/docker/konihaus-dashboard && /usr/local/bin/node brevo-sync.js >> brevo-sync.log 2>&1
+```
+
+Safety: it refuses to run if the JSON is empty, or if it would remove more than half of a list (`--force` overrides).
