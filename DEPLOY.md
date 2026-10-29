@@ -9,7 +9,7 @@ folder won't work. Run it with Node on the NAS and reach it over Tailscale only.
 ## 1. Read-only AWS user for the dashboard
 
 Create a separate IAM user (not the one your Vercel app uses) with this policy. Replace `YOUR-BUCKET`.
-`ListBucket` is needed so a not-yet-created `code-usages.json` shows as "empty" instead of "access denied".
+`ListBucket` is needed so a not-yet-created `code-usages.json` or `newsletter-clicks.json` shows as "empty" instead of "access denied".
 
 ```json
 {
@@ -19,7 +19,8 @@ Create a separate IAM user (not the one your Vercel app uses) with this policy. 
       "Resource": [
         "arn:aws:s3:::YOUR-BUCKET/emails.json",
         "arn:aws:s3:::YOUR-BUCKET/blog-emails.json",
-        "arn:aws:s3:::YOUR-BUCKET/code-usages.json"
+        "arn:aws:s3:::YOUR-BUCKET/code-usages.json",
+        "arn:aws:s3:::YOUR-BUCKET/newsletter-clicks.json"
       ] },
     { "Effect": "Allow", "Action": "s3:ListBucket", "Resource": "arn:aws:s3:::YOUR-BUCKET" }
   ]
